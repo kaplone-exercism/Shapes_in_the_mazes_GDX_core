@@ -1,0 +1,26 @@
+
+logo_sprites_couleur.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+maze_v2_color1
+  rotate: false
+  xy: 1, 398
+  size: 400, 395
+  orig: 400, 395
+  offset: 0, 0
+  index: -1
+maze_v2_color2
+  rotate: false
+  xy: 1, 1
+  size: 400, 395
+  orig: 400, 395
+  offset: 0, 0
+  index: -1
+maze_v2_color3
+  rotate: false
+  xy: 403, 398
+  size: 400, 395
+  orig: 400, 395
+  offset: 0, 0
+  index: -1

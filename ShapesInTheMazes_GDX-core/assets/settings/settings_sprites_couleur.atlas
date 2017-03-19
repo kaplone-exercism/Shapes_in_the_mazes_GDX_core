@@ -1,0 +1,40 @@
+
+settings_sprites_couleur.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+deux_roues_00_
+  rotate: false
+  xy: 1, 1
+  size: 150, 136
+  orig: 150, 136
+  offset: 0, 0
+  index: -1
+deux_roues_01_
+  rotate: false
+  xy: 153, 1
+  size: 150, 136
+  orig: 150, 136
+  offset: 0, 0
+  index: -1
+deux_roues_02_
+  rotate: false
+  xy: 305, 1
+  size: 150, 136
+  orig: 150, 136
+  offset: 0, 0
+  index: -1
+deux_roues_03_
+  rotate: false
+  xy: 457, 1
+  size: 150, 136
+  orig: 150, 136
+  offset: 0, 0
+  index: -1
+deux_roues_04_
+  rotate: false
+  xy: 609, 1
+  size: 150, 136
+  orig: 150, 136
+  offset: 0, 0
+  index: -1
