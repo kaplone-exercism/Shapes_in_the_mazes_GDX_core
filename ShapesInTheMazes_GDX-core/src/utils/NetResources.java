@@ -17,7 +17,7 @@ public class NetResources {
 		AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient();
 		
 		CompletableFuture<Response> f = asyncHttpClient
-	   		     .prepareGet("http://51.254.126.221:9000/assets/confs/niveaux.conf")
+	   		     .prepareGet("http://kaplone.fr/assets/confs/niveaux.conf")
 	   		     .execute()
 	   		     .toCompletableFuture();
 		

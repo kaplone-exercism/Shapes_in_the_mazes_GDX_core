@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -38,18 +39,23 @@ public class LaunchScreen implements Screen {
 	
 	TextButton quitter;
 	TextButton revenir;
+	TextButton lancer;
 	
 	ScrollPane scrollPane;
 	VerticalGroup vg;
 
 	List<Niveau> niveaux;
 	List<Mur2D> murs;
+	Personnage2D perso;
+	Goal2D goal;
 	Map<String, Niveau> niveaux_map;
 	
 	Label label;
 	Label labelInfos;
 	Niveau niveau;
 	Stage stage;
+	
+	TextButton tb_actif;
 	
 	public LaunchScreen(final Main_SITM_GDX game) {
 		super();
@@ -60,7 +66,7 @@ public class LaunchScreen implements Screen {
         
         stage = new Stage();
  
-        Table scrollTable = new Table();
+        final Table scrollTable = new Table();
         scrollTable.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         scrollPane = new ScrollPane(scrollTable, game.skin);
@@ -102,9 +108,13 @@ public class LaunchScreen implements Screen {
         
         for (String s : levels.split(System.lineSeparator())){
         	
+        	System.out.println(s);
+        	
         	if (s.trim() == "" || s.startsWith("#")){}
         	
         	else if (s.toLowerCase().trim().startsWith("[")){
+        		
+        		
 
         		if (niveaux_map != null){
         			
@@ -120,6 +130,11 @@ public class LaunchScreen implements Screen {
         		            murs = n.getListeDesMurs();
         		            label.setText(n.getNom().toUpperCase());
         		            labelInfos.setText(n.getInfos().length() > 100 ? n.getInfos().substring(0, 100) + " ..." : n.getInfos());
+        		            
+        		            lancer.setTouchable(Touchable.enabled);
+        		            lancer.setColor(lancer.getColor().r, lancer.getColor().g, lancer.getColor().b, 1F);
+        		            
+        		            tb_actif = tb;
         		        };
         			});
         			scrollTable.add(tb).align(Align.left);
@@ -130,11 +145,10 @@ public class LaunchScreen implements Screen {
         		}
         		
         		niveau = new Niveau();
-        		niveau.setIndex(index ++);
-        		niveau.setNom(s.trim().substring(1, s.trim().length() -1));
-        		
         		murs = new ArrayList<Mur2D>();
-		
+        		niveau.setIndex(index ++);
+        		niveau.setNom(s.trim().substring(1, s.trim().length() -1));	    			
+
         	}
         	else if (s.toLowerCase().startsWith("mur")){
         		Mur2D m = new Mur2D(Orientation.valueOf(s.split("=")[1].split(",")[0].trim().toUpperCase()),
@@ -169,7 +183,10 @@ public class LaunchScreen implements Screen {
         	}
         }
 		
-		niveau.setListeDesMurs(murs);
+        List<Mur2D> murs_dernier = new ArrayList<Mur2D>();
+        murs_dernier.addAll(murs);
+		niveau.setListeDesMurs(murs_dernier);
+		
 		niveaux_map.put(niveau.getNom(),niveau);
 		
 		final TextButton tb = new TextButton(niveau.getNom(), game.skin);
@@ -181,12 +198,18 @@ public class LaunchScreen implements Screen {
 	            murs = n.getListeDesMurs();
 	            label.setText(n.getNom().toUpperCase());
 	            labelInfos.setText(n.getInfos().length() > 100 ? n.getInfos().substring(0, 100) + " ..." : n.getInfos());
+	            
+	            lancer.setTouchable(Touchable.enabled);
+	            lancer.setColor(lancer.getColor().r, lancer.getColor().g, lancer.getColor().b, 1F);	  
+	            
+	            tb_actif = tb;
 	        };
 		});
 		scrollTable.add(tb).align(Align.left);
         scrollTable.row();
-        
+
         murs.clear();
+
         label.setText("Choisissez un niveau");
 
         quitter = new TextButton("Quitter", game.skin);
@@ -215,11 +238,22 @@ public class LaunchScreen implements Screen {
         });
         stage.addActor(revenir);
         
-        
-        
+        lancer = new TextButton("Lancer", game.skin);
+        lancer.setX(680);
+        lancer.setY(15);
+        lancer.setWidth(250);
+        lancer.setHeight(40);
+        lancer.setTouchable(Touchable.disabled);
+        lancer.setColor(lancer.getColor().r, lancer.getColor().g, lancer.getColor().b, 0.5F);
+        lancer.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event,float x,float y){
+            	game.setScreen(new GameScreen(game, niveaux_map.get(tb_actif.getLabel().getText().toString())));
+            }
+        });
+        stage.addActor(lancer);
+  
         Gdx.input.setInputProcessor(stage);	
-        
-        
     }
 
 	@Override
@@ -247,7 +281,10 @@ public class LaunchScreen implements Screen {
         shapeRenderer.setColor(0, 0, 0, 1);
         
         for (Mur2D m : murs){        	
-        	shapeRenderer.rect(m.getX() / 2 + 20, m.getY() / 2 + 100, m.getWidth() / 2, m.getHeight() / 2);
+        	shapeRenderer.rect(m.getX() / 2 + 20 ,
+        			           (100 + 300) - m.getY() / 2 - (m.getHeight() / 2),
+        			           m.getWidth() / 2,
+        			           m.getHeight() / 2);
 	    }
         
         shapeRenderer.end();

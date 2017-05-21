@@ -69,8 +69,10 @@ public class AnimationActor extends Actor{
         	
         	@Override
        	    public boolean keyTyped(InputEvent event, char character){
-       		System.out.println(character);
-                return false;
+        		System.out.println("key : ");
+        		System.out.println(event);
+       		    System.out.println(character);
+                return true;
        	 }
         });
 	}

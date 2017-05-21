@@ -7,8 +7,7 @@ public class Niveau {
 	private String nom;
 	private Personnage2D perso;
 	private Goal2D goal2D;
-	
-	private Temps horloge;
+
     private Thread chronoThread;
 	
 	private boolean enCoursDeFonctionnement;
@@ -21,11 +20,11 @@ public class Niveau {
 
 	public String getNom() {
 		
-		if(nom.toLowerCase().startsWith("practice")){
-			return String.format("Practice %02d", Integer.parseInt(nom.toLowerCase().split("practice")[1]));
+		if(nom != null && nom.toLowerCase().startsWith("practice")){
+			return String.format("Practice %02d", Integer.parseInt(nom.toLowerCase().split("practice")[1].trim()));
 		}
-		else if(nom.toLowerCase().startsWith("niveau")){
-			return String.format("Niveau %02d", Integer.parseInt(nom.toLowerCase().split("niveau")[1]));
+		else if(nom != null && nom.toLowerCase().startsWith("niveau")){
+			return String.format("Niveau %02d", Integer.parseInt(nom.toLowerCase().split("niveau")[1].trim()));
 		}		
 		return nom;
 	}
@@ -45,12 +44,7 @@ public class Niveau {
     public void setListeDesMurs(List<Mur2D> listeDesMurs) {
 		this.listeDesMurs = listeDesMurs;
 	}
-	public Temps getHorloge() {
-		return horloge;
-	}
-	public void setHorloge(Temps horloge) {
-		this.horloge = horloge;
-	}
+
 	public Goal2D getGoal2D() {
 		return goal2D;
 	}
