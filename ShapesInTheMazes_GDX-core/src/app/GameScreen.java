@@ -108,34 +108,36 @@ public class GameScreen implements Screen ,InputProcessor {
 			fixtureDef_.filter.categoryBits = MURS_CATEGORY;
 			fixtureDef_.filter.maskBits = MURS_MASK;
 			//fixtureDef_.filter.groupIndex = MURS;
-			fixtureDef_.isSensor = true;
+			//fixtureDef_.isSensor = true;
 			fixtureDef_.shape = wallBox;
-			wallBody.createFixture(fixtureDef_);	
+			Fixture f = wallBody.createFixture(fixtureDef_);
+			f.setUserData(m);
 			//System.out.println(wallBody.getPosition());
+			wallBox.dispose();
 		}
 
 		bodyDef = new BodyDef();
 		bodyDef.type = BodyType.DynamicBody;
 		bodyDef.position.set(-500 + perso.getWidth()/2 + perso.getX(),
 				              250 - perso.getHeight()/2  - perso.getY());
-		//bodyDef.position.set(perso.getX()+ 20,20 + perso.getY());
-
+		
 		body = world.createBody(bodyDef);
+		body.setFixedRotation(true);
+		
 		PolygonShape perso_ = new PolygonShape();
-		perso_.setAsBox(perso.getWidth() / 2, perso.getHeight() / 2);
+		perso_.setAsBox(perso.getWidth() / 2 - 0.5f, perso.getHeight() / 2 - 0.5f);
+		
 		FixtureDef fixtureDef = new FixtureDef();
 		fixtureDef.filter.categoryBits = JOUEURS_CATEGORY;
 		fixtureDef.filter.maskBits = JOUEURS_MASK;
-		//fixtureDef.filter.groupIndex = JOUEURS;
-		fixtureDef.isSensor = true;
 		fixtureDef.shape = perso_;
-		fixtureDef.density = 0.5f; 
-		fixtureDef.friction = 0.4f;
-		fixtureDef.restitution = 0.6f; // Make it bounce a little bit
+		fixtureDef.density = 0.1f;
+		fixtureDef.friction = 0.01f;
+		fixtureDef.restitution = 0f;
 		fixture = body.createFixture(fixtureDef);
 		fixture.setUserData(perso);
 		
-		//perso_.dispose();
+		perso_.dispose();
 		
 		//System.setProperty("org.lwjgl.opengl.Window.undecorated", "false");
 		Gdx.graphics.setWindowedMode(1040, 740);
@@ -168,6 +170,9 @@ public class GameScreen implements Screen ,InputProcessor {
 //		gameActor.setTouchable(Touchable.enabled);
 //		stage.addActor(gameActor);
 		
+		System.out.println("world body count = " + world.getBodyCount());
+        System.out.println("world fixture count = " + world.getFixtureCount());
+		
 		Gdx.input.setInputProcessor(this);	
 	}
 	
@@ -185,20 +190,22 @@ public class GameScreen implements Screen ,InputProcessor {
         stage.draw();
         stage.act();
         
+        camera.update();
+        // Step the physics simulation forward at a rate of 60hz
+        world.step(1f/60f, 6, 2);
+        
         moveX += deltaX;
         moveY += deltaY;
         
-        body.setTransform(-500 + perso.getWidth()/2 + moveX + perso.getX(),
-        		           250 - perso.getHeight()/2  - perso.getY() + moveY, 0f);
-        
+        //debugRenderer.render(world, camera.combined);
+     
         shapeRenderer.begin(ShapeType.Filled);
         
         if (! murs.isEmpty()){
         	shapeRenderer.setColor(1, 1, 1, 1);
             shapeRenderer.rect(20, 20, 1000, 600);
         }
-        
-        
+
         shapeRenderer.setColor(0, 0, 0, 1);
         
         for (Mur2D m : murs){        	
@@ -210,21 +217,17 @@ public class GameScreen implements Screen ,InputProcessor {
         
         shapeRenderer.setColor(0.9F, 0.6F, 0.5F, 1);
         
-        shapeRenderer.rect(perso.getX()+ 20 + moveX,
-		           (20 + 600) - perso.getY() - (perso.getHeight()) + moveY,
-		           perso.getWidth(),
-		           perso.getHeight());
-        
-        //perso.setPosition(body.getPosition().x, body.getPosition().y);
-        
+        shapeRenderer.rect(body.getPosition().x + 520 - perso.getWidth()/2,
+		                   body.getPosition().y + 370 - perso.getHeight()/2,
+		                   perso.getWidth(),
+		                   perso.getHeight());
+
         shapeRenderer.end();
         
         stage.getBatch().begin();
         stage.getBatch().draw(goal.getTexture(), goal.getX() + 20 , (20 + 600) - goal.getY() - goal.getHeight());
         stage.getBatch().end();
-		
         
-        //System.out.println(fixture.getBody().getPosition());
         debugRenderer.render(world, camera.combined);
 	}
 
@@ -271,15 +274,19 @@ public class GameScreen implements Screen ,InputProcessor {
 			deltaX = -1;
 //			Vector2 pos = body.getPosition();
 //	        body.applyLinearImpulse(2f, 0f, pos.x, pos.y, true);
+			body.setLinearVelocity(-100f, 0f);
 			break;
 		case Keys.RIGHT:
 			deltaX = 1;
+			body.setLinearVelocity(100f, 0f);
 			break;
 		case Keys.UP:
 			deltaY = 1;
+			body.setLinearVelocity(0f, 100f);
 			break;
 		case Keys.DOWN:
 			deltaY = -1;
+			body.setLinearVelocity(0f, -100f);
 			break;
 		default:
 			break;
@@ -289,6 +296,7 @@ public class GameScreen implements Screen ,InputProcessor {
 
 	@Override
 	public boolean keyUp(int keycode) {
+		body.setLinearVelocity(0f, 0f);
 		deltaX = 0;
 		deltaY = 0;
 		return false;

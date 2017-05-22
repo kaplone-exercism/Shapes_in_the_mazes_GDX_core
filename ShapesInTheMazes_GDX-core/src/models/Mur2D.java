@@ -36,7 +36,8 @@ public class Mur2D extends Rectangle{
 
 	@Override
 	public String toString(){
-		return String.format("%s :\nposition = %d\ndébut = %d\nfin = %d", this.nom, this.position, this.debut, this.fin);
+		//return String.format("%s :\nposition = %d\ndébut = %d\nfin = %d", this.nom, this.position, this.debut, this.fin);
+		return "Mur2D";
 	}
 	
     
