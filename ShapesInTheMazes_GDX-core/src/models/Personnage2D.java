@@ -12,7 +12,7 @@ import enums.Sens;
 public class Personnage2D extends Actor{
 
 	private Niveau niveau;
-	private final double surface;
+	private final float surface;
 
 
 	private float x;
@@ -27,7 +27,7 @@ public class Personnage2D extends Actor{
 		this.y = (float) y;
 		this.width = (float) width;
 		this.height = (float) height;
-		this.surface = width * height;
+		this.surface = (float) (width * height);
 		this.niveau = niveau;
 	}
 
@@ -46,27 +46,36 @@ public class Personnage2D extends Actor{
 	public void setY(double y) {
 		this.y = (float) y;
 	}
-
+    
+	@Override
 	public float getWidth() {
 		return width;
 	}
 
-	public void setWidth(double width) {
-		this.width = (float) width;
+//	public void setWidth(double width) {
+//		this.width = (float) width;
+//	}
+	
+	@Override
+	public void setWidth(float width) {
+		this.width = width;
 	}
 
+	@Override
 	public float getHeight() {
 		return height;
 	}
-
-	public void setHeight(double height) {
-		this.height = (float) height;
-	}
-
-	public double getSurface() {
-		return surface;
-	}
     
-    
+//	public void setHeight(double height) {
+//		this.height = (float) height;
+//	}
 	
+	@Override
+	public void setHeight(float height) {
+		this.height = height;
+	}
+
+	public float getSurface() {
+		return surface;
+	}	
 }

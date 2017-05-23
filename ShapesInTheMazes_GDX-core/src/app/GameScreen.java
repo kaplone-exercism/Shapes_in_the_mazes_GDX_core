@@ -60,9 +60,6 @@ public class GameScreen implements Screen ,InputProcessor {
 	private Goal2D goal;
 	private Personnage2D perso;
 	
-	private int deltaX;
-	private int deltaY;
-	
 	private int moveX;
 	private int moveY;
 	
@@ -107,12 +104,9 @@ public class GameScreen implements Screen ,InputProcessor {
 			FixtureDef fixtureDef_ = new FixtureDef();
 			fixtureDef_.filter.categoryBits = MURS_CATEGORY;
 			fixtureDef_.filter.maskBits = MURS_MASK;
-			//fixtureDef_.filter.groupIndex = MURS;
-			//fixtureDef_.isSensor = true;
 			fixtureDef_.shape = wallBox;
 			Fixture f = wallBody.createFixture(fixtureDef_);
 			f.setUserData(m);
-			//System.out.println(wallBody.getPosition());
 			wallBox.dispose();
 		}
 
@@ -125,18 +119,17 @@ public class GameScreen implements Screen ,InputProcessor {
 		body.setFixedRotation(true);
 		
 		PolygonShape perso_ = new PolygonShape();
-		perso_.setAsBox(perso.getWidth() / 2 - 0.5f, perso.getHeight() / 2 - 0.5f);
+		perso_.setAsBox(perso.getWidth() / 2f, perso.getHeight() / 2f);
 		
 		FixtureDef fixtureDef = new FixtureDef();
 		fixtureDef.filter.categoryBits = JOUEURS_CATEGORY;
 		fixtureDef.filter.maskBits = JOUEURS_MASK;
 		fixtureDef.shape = perso_;
 		fixtureDef.density = 0.1f;
-		fixtureDef.friction = 0.01f;
+		fixtureDef.friction = 10f;
 		fixtureDef.restitution = 0f;
 		fixture = body.createFixture(fixtureDef);
-		fixture.setUserData(perso);
-		
+		fixture.setUserData(perso);	
 		perso_.dispose();
 		
 		//System.setProperty("org.lwjgl.opengl.Window.undecorated", "false");
@@ -146,32 +139,6 @@ public class GameScreen implements Screen ,InputProcessor {
 		shapeRenderer = new ShapeRenderer();
 		
 		stage.addActor(goal);
-		
-//		InputProcessor backProcessor = new InputAdapter() {
-//            @Override
-//            public boolean keyDown(int keycode) {
-//
-//                if ((keycode == Keys.ESCAPE) || (keycode == Keys.BACK) ){
-//                	game.setScreen(new LaunchScreen(game));
-//                }
-//                else {
-//                	System.out.println(keycode);
-//                }
-//                return true;
-//            }
-//            
-//        };
-//
-//
-//        InputMultiplexer multiplexer = new InputMultiplexer(stage, backProcessor);
-//        Gdx.input.setInputProcessor(multiplexer);
-		
-//		GameKeyboardActor gameActor = new GameKeyboardActor();
-//		gameActor.setTouchable(Touchable.enabled);
-//		stage.addActor(gameActor);
-		
-		System.out.println("world body count = " + world.getBodyCount());
-        System.out.println("world fixture count = " + world.getFixtureCount());
 		
 		Gdx.input.setInputProcessor(this);	
 	}
@@ -193,10 +160,7 @@ public class GameScreen implements Screen ,InputProcessor {
         camera.update();
         // Step the physics simulation forward at a rate of 60hz
         world.step(1f/60f, 6, 2);
-        
-        moveX += deltaX;
-        moveY += deltaY;
-        
+
         //debugRenderer.render(world, camera.combined);
      
         shapeRenderer.begin(ShapeType.Filled);
@@ -271,22 +235,17 @@ public class GameScreen implements Screen ,InputProcessor {
 			game.setScreen(new LaunchScreen(game));
 			break;
 		case Keys.LEFT:
-			deltaX = -1;
-//			Vector2 pos = body.getPosition();
-//	        body.applyLinearImpulse(2f, 0f, pos.x, pos.y, true);
-			body.setLinearVelocity(-100f, 0f);
+			
+			body.setLinearVelocity(-100f, body.getLinearVelocity().y);
 			break;
 		case Keys.RIGHT:
-			deltaX = 1;
-			body.setLinearVelocity(100f, 0f);
+			body.setLinearVelocity(100f, body.getLinearVelocity().y);
 			break;
 		case Keys.UP:
-			deltaY = 1;
-			body.setLinearVelocity(0f, 100f);
+			body.setLinearVelocity(body.getLinearVelocity().x, 100f);
 			break;
 		case Keys.DOWN:
-			deltaY = -1;
-			body.setLinearVelocity(0f, -100f);
+			body.setLinearVelocity(body.getLinearVelocity().x, -100f);
 			break;
 		default:
 			break;
@@ -296,9 +255,23 @@ public class GameScreen implements Screen ,InputProcessor {
 
 	@Override
 	public boolean keyUp(int keycode) {
-		body.setLinearVelocity(0f, 0f);
-		deltaX = 0;
-		deltaY = 0;
+		
+		switch (keycode) {
+		case Keys.LEFT:			
+			body.setLinearVelocity(0f, body.getLinearVelocity().y);
+			break;
+		case Keys.RIGHT:
+			body.setLinearVelocity(0f, body.getLinearVelocity().y);
+			break;
+		case Keys.UP:
+			body.setLinearVelocity(body.getLinearVelocity().x, 0f);
+			break;
+		case Keys.DOWN:
+			body.setLinearVelocity(body.getLinearVelocity().x, 0f);
+			break;
+		default:
+			break;
+		}
 		return false;
 	}
 
@@ -338,4 +311,8 @@ public class GameScreen implements Screen ,InputProcessor {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	public Body getBody() {
+		return body;
+	}	
 }
