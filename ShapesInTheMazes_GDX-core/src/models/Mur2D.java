@@ -1,5 +1,6 @@
 package models;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 
@@ -14,6 +15,7 @@ public class Mur2D extends Rectangle{
 	private final int fin;
 	private final String nom;
 	private Label infos;
+	private Color couleur;
 	
 	private double decalageH;
 	private double decalageV;
@@ -32,6 +34,7 @@ public class Mur2D extends Rectangle{
 		this.debut = debut;
 		this.fin = fin;
 		this.nom = nom;
+		this.couleur = Color.BLACK;
 	}
 
 	@Override
@@ -82,7 +85,13 @@ public class Mur2D extends Rectangle{
 
 	public void setInfos(Label infos) {
 		this.infos = infos;
+	}
+
+	public Color getCouleur() {
+		return couleur;
+	}
+
+	public void setCouleur(Color couleur) {
+		this.couleur = couleur;
 	}	
-	
-	
 }

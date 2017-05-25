@@ -23,6 +23,7 @@ import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
@@ -76,6 +77,12 @@ public class GameScreen implements Screen ,InputProcessor {
 	private Fixture fixture;
 	
 	private List<Fixture> fixtures;
+	private List<Contact> contacts;
+	private List<Contact> copie_contacts;
+	
+	private ContactListener detectContacts;
+	
+	private Vector2 vitesse_save;
 	
 	public GameScreen(final Main_SITM_GDX game, Niveau niveau) {
 		super();
@@ -86,8 +93,13 @@ public class GameScreen implements Screen ,InputProcessor {
 		this.perso = niveau.getPerso();
 
 		world = new World(new Vector2(0F, 0F), true);
-		world.setContactListener(new DetectionContact(this));
+		//world.setContactListener(new DetectionContact(this));
 		world.step(1/60f, 6, 2);
+		
+		detectContacts = new DetectionContact(this);
+		
+		contacts = new ArrayList<>();
+		copie_contacts = new ArrayList<>();
 		
 		camera = new OrthographicCamera(VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
 		
@@ -118,6 +130,9 @@ public class GameScreen implements Screen ,InputProcessor {
 		body = world.createBody(bodyDef);
 		body.setFixedRotation(true);
 		
+
+		vitesse_save = new Vector2(0f, 0f);
+		
 		PolygonShape perso_ = new PolygonShape();
 		perso_.setAsBox(perso.getWidth() / 2f, perso.getHeight() / 2f);
 		
@@ -125,8 +140,8 @@ public class GameScreen implements Screen ,InputProcessor {
 		fixtureDef.filter.categoryBits = JOUEURS_CATEGORY;
 		fixtureDef.filter.maskBits = JOUEURS_MASK;
 		fixtureDef.shape = perso_;
-		fixtureDef.density = 0.1f;
-		fixtureDef.friction = 10f;
+		fixtureDef.density = 0f;
+		fixtureDef.friction = 0f;
 		fixtureDef.restitution = 0f;
 		fixture = body.createFixture(fixtureDef);
 		fixture.setUserData(perso);	
@@ -139,7 +154,6 @@ public class GameScreen implements Screen ,InputProcessor {
 		shapeRenderer = new ShapeRenderer();
 		
 		stage.addActor(goal);
-		
 		Gdx.input.setInputProcessor(this);	
 	}
 	
@@ -152,7 +166,7 @@ public class GameScreen implements Screen ,InputProcessor {
 	@Override
 	public void render(float delta) {
 		Gdx.gl.glClearColor(0.8F, 0.7F, 0.6f, 0.1F);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);      
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);    
         
         stage.draw();
         stage.act();
@@ -172,11 +186,13 @@ public class GameScreen implements Screen ,InputProcessor {
 
         shapeRenderer.setColor(0, 0, 0, 1);
         
-        for (Mur2D m : murs){        	
+        for (Mur2D m : murs){   
+        	shapeRenderer.setColor(m.getCouleur());
         	shapeRenderer.rect(m.getX()+ 20 ,
         			           (20 + 600) - m.getY() - (m.getHeight()),
         			           m.getWidth(),
         			           m.getHeight());
+        	
 	    }
         
         shapeRenderer.setColor(0.9F, 0.6F, 0.5F, 1);
@@ -193,6 +209,39 @@ public class GameScreen implements Screen ,InputProcessor {
         stage.getBatch().end();
         
         debugRenderer.render(world, camera.combined);
+        
+
+    	copie_contacts.clear();
+    	
+    	for (Contact c : contacts){
+    		if (! world.getContactList().contains(c, true)){
+    			System.out.println("traitement de " + c + " en retrait");
+    			detectContacts.endContact(c);
+    		}
+    		else {
+    			copie_contacts.add(c);
+    		}        		
+    	}
+    	
+    	contacts.clear();
+    	contacts.addAll(copie_contacts);
+        	
+    	copie_contacts.clear();
+    	
+    	for (Contact c : world.getContactList()){
+    		if (! contacts.contains(c)){
+    			System.out.println("traitement de " + c + " en ajout");
+    			detectContacts.beginContact(c);
+    		}
+    		copie_contacts.add(c);
+    	}
+    	
+    	contacts.clear();
+    	contacts.addAll(copie_contacts);
+
+        //System.out.println("vitesse après render() : " + body.getLinearVelocity());
+        body.setLinearVelocity(vitesse_save);
+        //System.out.println("vitesse après render() : " + body.getLinearVelocity());
 	}
 
 	@Override
@@ -228,14 +277,15 @@ public class GameScreen implements Screen ,InputProcessor {
 
 	@Override
 	public boolean keyDown(int keycode) {
+		
+		//System.out.println("keydown : " + keycode);
 
 		switch (keycode) {
 		case Keys.ESCAPE:
 		case Keys.BACK:
 			game.setScreen(new LaunchScreen(game));
 			break;
-		case Keys.LEFT:
-			
+		case Keys.LEFT:			
 			body.setLinearVelocity(-100f, body.getLinearVelocity().y);
 			break;
 		case Keys.RIGHT:
@@ -250,11 +300,16 @@ public class GameScreen implements Screen ,InputProcessor {
 		default:
 			break;
 		}
-		return false;
+		
+		vitesse_save = body.getLinearVelocity();
+		//System.out.println("linearVelocity (down) = " + body.getLinearVelocity());
+		return true;
 	}
 
 	@Override
 	public boolean keyUp(int keycode) {
+		
+		//System.out.println("keyup : " + keycode);
 		
 		switch (keycode) {
 		case Keys.LEFT:			
@@ -272,7 +327,10 @@ public class GameScreen implements Screen ,InputProcessor {
 		default:
 			break;
 		}
-		return false;
+		
+		vitesse_save = body.getLinearVelocity();
+		//System.out.println("linearVelocity (up) = " + body.getLinearVelocity());
+		return true;
 	}
 
 	@Override
@@ -315,4 +373,8 @@ public class GameScreen implements Screen ,InputProcessor {
 	public Body getBody() {
 		return body;
 	}	
+	
+	public World getWorld(){
+		return world;
+	}
 }
