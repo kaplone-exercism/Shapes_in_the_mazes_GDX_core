@@ -1,5 +1,8 @@
 package models;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -19,6 +22,8 @@ public class Mur2D extends Rectangle{
 	
 	private double decalageH;
 	private double decalageV;
+	
+	private Map<String, Boolean> contacts;
 
 	
 	public Mur2D(Orientation orientation, int epaisseur, int position, int debut, int fin, String nom) {
@@ -35,6 +40,14 @@ public class Mur2D extends Rectangle{
 		this.fin = fin;
 		this.nom = nom;
 		this.couleur = Color.BLACK;
+		
+		
+		// reperage inverse (pour correspondre a ceux de DetectionContact)
+		contacts = new HashMap<>();		
+		contacts.put("haut", false);
+		contacts.put("bas", false);
+		contacts.put("droite", false);
+		contacts.put("gauche", false);
 	}
 
 	@Override
@@ -93,5 +106,13 @@ public class Mur2D extends Rectangle{
 
 	public void setCouleur(Color couleur) {
 		this.couleur = couleur;
+	}
+
+	public Map<String, Boolean> getContacts() {
+		return contacts;
+	}
+
+	public void setContacts(Map<String, Boolean> contacts) {
+		this.contacts = contacts;
 	}	
 }

@@ -93,7 +93,7 @@ public class GameScreen implements Screen ,InputProcessor {
 		this.perso = niveau.getPerso();
 
 		world = new World(new Vector2(0F, 0F), true);
-		//world.setContactListener(new DetectionContact(this));
+		world.setContactListener(new DetectionContact(this));
 		world.step(1/60f, 6, 2);
 		
 		detectContacts = new DetectionContact(this);
@@ -209,39 +209,8 @@ public class GameScreen implements Screen ,InputProcessor {
         stage.getBatch().end();
         
         debugRenderer.render(world, camera.combined);
-        
 
-    	copie_contacts.clear();
-    	
-    	for (Contact c : contacts){
-    		if (! world.getContactList().contains(c, true)){
-    			System.out.println("traitement de " + c + " en retrait");
-    			detectContacts.endContact(c);
-    		}
-    		else {
-    			copie_contacts.add(c);
-    		}        		
-    	}
-    	
-    	contacts.clear();
-    	contacts.addAll(copie_contacts);
-        	
-    	copie_contacts.clear();
-    	
-    	for (Contact c : world.getContactList()){
-    		if (! contacts.contains(c)){
-    			System.out.println("traitement de " + c + " en ajout");
-    			detectContacts.beginContact(c);
-    		}
-    		copie_contacts.add(c);
-    	}
-    	
-    	contacts.clear();
-    	contacts.addAll(copie_contacts);
-
-        //System.out.println("vitesse après render() : " + body.getLinearVelocity());
         body.setLinearVelocity(vitesse_save);
-        //System.out.println("vitesse après render() : " + body.getLinearVelocity());
 	}
 
 	@Override
