@@ -1,42 +1,26 @@
 package app;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-
-import com.badlogic.gdx.math.Intersector;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Contact;
-import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
-import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 
-//import ContactListener;
-
-import actors.GameKeyboardActor;
 import models.Goal2D;
 import models.Mur2D;
 import models.Niveau;
@@ -55,15 +39,11 @@ public class GameScreen implements Screen ,InputProcessor {
 	final Main_SITM_GDX game;
 	private Stage stage;
 	private ShapeRenderer shapeRenderer;
-	
-	private Niveau niveau;
+
 	private List<Mur2D> murs;
 	private Goal2D goal;
 	private Personnage2D perso;
-	
-	private int moveX;
-	private int moveY;
-	
+
 	private World world ;
 	private Box2DDebugRenderer debugRenderer;
 	
@@ -76,18 +56,11 @@ public class GameScreen implements Screen ,InputProcessor {
 	private BodyDef bodyDef;
 	private Fixture fixture;
 	
-	private List<Fixture> fixtures;
-	private List<Contact> contacts;
-	private List<Contact> copie_contacts;
-	
-	private ContactListener detectContacts;
-	
 	private Vector2 vitesse_save;
 	
 	public GameScreen(final Main_SITM_GDX game, Niveau niveau) {
 		super();
 		this.game = game;
-		this.niveau = niveau;
 		this.murs = niveau.getListeDesMurs();
 		this.goal = niveau.getGoal2D();
 		this.perso = niveau.getPerso();
@@ -95,12 +68,7 @@ public class GameScreen implements Screen ,InputProcessor {
 		world = new World(new Vector2(0F, 0F), true);
 		world.setContactListener(new DetectionContact(this));
 		world.step(1/60f, 6, 2);
-		
-		detectContacts = new DetectionContact(this);
-		
-		contacts = new ArrayList<>();
-		copie_contacts = new ArrayList<>();
-		
+
 		camera = new OrthographicCamera(VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
 		
 		debugRenderer = new Box2DDebugRenderer();
@@ -208,7 +176,7 @@ public class GameScreen implements Screen ,InputProcessor {
         stage.getBatch().draw(goal.getTexture(), goal.getX() + 20 , (20 + 600) - goal.getY() - goal.getHeight());
         stage.getBatch().end();
         
-        debugRenderer.render(world, camera.combined);
+        //debugRenderer.render(world, camera.combined);
 
         body.setLinearVelocity(vitesse_save);
 	}
