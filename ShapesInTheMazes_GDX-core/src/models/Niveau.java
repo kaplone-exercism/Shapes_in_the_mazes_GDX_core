@@ -20,12 +20,12 @@ public class Niveau {
 
 	public String getNom() {
 		
-		if(nom != null && nom.toLowerCase().startsWith("practice")){
-			return String.format("Practice %02d", Integer.parseInt(nom.toLowerCase().split("practice")[1].trim()));
-		}
-		else if(nom != null && nom.toLowerCase().startsWith("niveau")){
-			return String.format("Niveau %02d", Integer.parseInt(nom.toLowerCase().split("niveau")[1].trim()));
-		}		
+//		if(nom != null && nom.toLowerCase().startsWith("practice")){
+//			return String.format("Practice %02d", Integer.parseInt(nom.toLowerCase().split("practice")[1].trim()));
+//		}
+//		else if(nom != null && nom.toLowerCase().startsWith("niveau")){
+//			return String.format("Niveau %02d", Integer.parseInt(nom.toLowerCase().split("niveau")[1].trim()));
+//		}		
 		return nom;
 	}
 	public void setNom(String nom) {
